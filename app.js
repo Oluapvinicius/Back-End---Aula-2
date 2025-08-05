@@ -5,9 +5,17 @@
  * Versão: 1.0
  ***************************************************************************/
 
+const MESSAGE_ERROR_EMPTY = 'ERRO: Não foi possivel calcular a medía, pois existem, campos qeu não foram preechidos!'
+const MENSSAGE_ERROR_OUT_OF_RANGE = 'ERRO: Não foi possivel menores que 0 ou valores maior que 10!'
+const MENSSAGE_ERROR_NAN = 'ERRO: não é possivel processar o calculo da média com caracteres. Deve-se entrar com numeros entre 0 a 10!'
+
+
+
+//Import da biblioteca para calcular as médias escolares
+const mediaEscolar = require('./modulo/media.js')
+
 //Import da biblioteca para permitir a entrada de dados pelo terminal
-const { Console } = require('console')
-const { parse } = require('path')
+
 var readline = require('readline')
 
 //Criando uma interface da entrada e saída de dados no terminal
@@ -74,29 +82,32 @@ entradaDeDados.question('Digite o nome do aluno:', function(nome){
                 entradaDeDados.question('Digite a nota 4:', function(valor4){
                     let nota4 = valor4
                     
+                    //Validação de entrada vazia
+                    if(nomeAluno == '' || nota1 == '' || nota2 == '' || 
+                                          nota3 == '' || nota4 == '' ){
+                        console.log(MESSAGE_ERROR_EMPTY)
 
-                    if(nomeAluno == '' || nota1 == '' || nota2 == '' || nota3 == '' || nota4 == '' ){
-                        console.log('ERRO: Não foi possivel calcular a medía, pois existem, campos qeu não foram preechidos!')
-                    }else if(nota1 < 0 || nota1 > 10 || nota2 < 0 || nota2 > 10 || nota3 < 0 || nota3 > 10 || nota4 < 0 || nota4 > 10){
-                        console.log('ERRO: Não foi possivel menores que 0 ou valores maior que 10!')
-                    
+                    //Validação de valores entre 0 até 10
+                    }else if(Number(nota1) < 0 || Number(nota1) > 10 || 
+                             Number(nota2) < 0 || Number(nota2) > 10 || 
+                             Number(nota3) < 0 || Number(nota3) > 10 || 
+                             Number(nota4) < 0 || Number(nota4) > 10
+                             ){
+                        console.log(MENSSAGE_ERROR_OUT_OF_RANGE)
+                            //Validação pra bloquear a entrada de letras
+                    }else if(isNaN(nota1) || isNaN (nota2) || isNaN (nota3) || isNaN (nota4)){
+                        console.log(MENSSAGE_ERROR_NAN)
+
                     }else{
-                        let media = (Number(nota1) + Number(nota2) + Number(nota3) + Number(nota4)) / 4
-                        let statusAluno
+                        let media = mediaEscolar.calcularMedia( nota1, nota2, nota3, nota4)
+                        let statusAluno = mediaEscolar.validarStatusMedia(media)
 
-                        if(media < 5){
-                            statusAluno = 'Reprovado'
-
-                        }else if(media >= 5 && media < 7){
-                            statusAluno = 'EXAME'
-
-                        }else if(media >=7 && media <= 10){
-                            statusAluno = 'APROVADO'
+                        if(statusAluno){
+                        
+                        
+                        console.log(`O aluno ${nomeAluno} teve a média ${media} e esta em ${statusAluno}`)
+                        
                         }
-                        
-                        console.log(`O aluno ${nomeAluno} teve a média ${media.toFixed(1)} e esta em ${statusAluno}`)
-                        
-
                     } 
 
                 })//Fecha a entrada da nota 4
